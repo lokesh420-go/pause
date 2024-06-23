@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS Vertical Text</title>
+    <style>
+        @font-face {
+            font-family: 'Rostave';
+            src: url('Rostave.woff2') format('woff2'), 
+                 url('Rostave.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Set margin and padding to 0 for body and all elements */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: black;
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevent vertical scrollbar */
+        }
+
+        .left-half, .right-half {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden; /* Hide overflow content */
+        }
+
+        .left-half {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Align items to the left */
+            padding-left: 20px; /* Add padding to the left */
+        }
+
+        .vertical-text {
+            font-family: 'Rostave', sans-serif;
+            color: rgb(125, 124, 124);
+            font-size: 90px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            margin-right: 20px; /* Space between text and image */
+        }
+
+        .image {
+            width: 500px; /* Adjust the size as needed */
+            height: auto;
+            opacity: 1; /* Initially visible */
+            transition: opacity 0.5s ease-in-out; /* Smooth transition effect */
+            margin-left: 20px; /* Space between text and image */
+        }
+
+        .text-alternate {
+            font-family: 'Rostave', sans-serif;
+            color: white;
+            font-size: 60px; /* Decrease text size */
+            opacity: 0; /* Initially hidden */
+            position: absolute;
+            left: 300px; /* Move a bit to the right */
+            top: 50%;
+            transform: translateY(-50%);
+            transition: opacity 0.5s ease-in-out; /* Smooth transition effect */
+        }
+
+        .divider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px; /* Adjust thickness of the line */
+            background-color: white;
+            transform: translateX(-50%);
+            z-index: 1; /* Ensure it's above other content */
+        }
+
+        .right-half {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: black; /* Ensure canvas is on a black background */
+            position: relative;
+        }
+
+        .top-paragraph {
+            color: white;
+            font-family: 'Rostave', sans-serif;
+            font-size: 20px;
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            width: 100%;
+            margin-top: -500px;
+        }
+
+        .followers-heading {
+            color: rgb(9, 75, 255);
+            font-family: 'Rostave', sans-serif;
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .glass-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(5px);
+            height: auto;
+            width: 500px;
+        }
+
+        .glass-container img {
+            width: 50px; /* Adjust the size as needed */
+            height: auto;
+            margin-right: 10px;
+        }
+
+        .glass-container .tarak-text {
+            font-family: 'Rostave', sans-serif;
+            color: white;
+            font-size: 20px;
+        }
+
+        #particle-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-half">
+        <div class="vertical-text">NEXUS</div>
+        <img src="ga.gif" alt="GA Logo" class="image" id="toggle-element">
+        <div class="text-alternate" id="toggle-text">PAUSED</div>
+    </div>
+    <div class="divider"></div>
+    <div class="right-half">
+        <div class="followers-heading">Followers</div>
+        <div class="glass-container">
+            <img src="twitch.png" alt="Twitch Logo">
+            <div class="tarak-text">Baritix494</div>
+        </div>
+        <div class="glass-container">
+            <img src="youtube.png" alt="Twitch Logo">
+            <div class="tarak-text">Roberto Minichelli</div>
+        </div>
+        <canvas id="particle-canvas"></canvas>
+    </div>
+    
+
+    <script>
+        function toggleImageText() {
+            const image = document.getElementById('toggle-element');
+            const text = document.getElementById('toggle-text');
+            setInterval(function () {
+                if (image.style.opacity !== '0') {
+                    image.style.opacity = '0';
+                    text.style.opacity = '1';
+                } else {
+                    image.style.opacity = '1';
+                    text.style.opacity = '0';
+                }
+            }, 5000); // Toggle every 5 seconds
+        }
+
+        function createParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; // Set canvas size to match container
+            canvas.height = window.innerHeight;
+
+            // Array to store particles
+            const particles = [];
+
+            // Function to create a single particle
+            function createParticle() {
+                const particle = {
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1, // Random radius between 1 and 3
+                    color: Math.random() < 0.5 ? 'blue' : 'white', // Randomly choose blue or white
+                    velocity: {
+                        x: (Math.random() - 0.5) * 2, // Random velocity in x direction
+                        y: (Math.random() - 0.5) * 2  // Random velocity in y direction
+                    }
+                };
+
+                particles.push(particle);
+            }
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(particle => {
+                    // Move particle
+                    particle.x += particle.velocity.x;
+                    particle.y += particle.velocity.y;
+
+                    // Draw particle
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+
+                    // Wrap around edges
+                    if (particle.x < 0 || particle.x > canvas.width || particle.y < 0 || particle.y > canvas.height) {
+                        particle.x = Math.random() * canvas.width;
+                        particle.y = Math.random() * canvas.height;
+                    }
+                });
+
+                // Reduce particle count over time
+                if (particles.length > 50) {
+                    particles.splice(0, 1); // Remove oldest particle
+                }
+
+                // Create new particles gradually
+                if (Math.random() > 0.95) {
+                    createParticle();
+                }
+            }
+
+            animate();
+        }
+
+        window.onload = function () {
+            toggleImageText();
+            createParticles();
+        };
+    </script>
+</body>
+</html>
